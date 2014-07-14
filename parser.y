@@ -34,23 +34,23 @@ int token;
 program : TOPENPAREN list TCLOSEPAREN {root = new ProgramNode($2);}
         ;
 
-list    : list TPLUS TINTEGER {
+list    : TINTEGER { $$ = new NumberNode(std::stoi(*$1));}
+        | list TPLUS list {
             $$ = new BinaryFunctionNode(BinaryFunctionNode::Operation::addition,
-               $1, new NumberNode(std::stoi(*$3)));
+               $1, $3);
         }
-        | list TMINUS TINTEGER {
+        | list TMINUS list {
             $$ = new BinaryFunctionNode(BinaryFunctionNode::Operation::subtraction,
-               $1, new NumberNode(std::stoi(*$3)));
+               $1, $3);
         }
-        | list TMULT TINTEGER {
+        | list TMULT list {
             $$ = new BinaryFunctionNode(BinaryFunctionNode::Operation::multiplication,
-               $1, new NumberNode(std::stoi(*$3)));
+               $1, $3);
         }
-        | list TDIV TINTEGER {
+        | list TDIV list {
             $$ = new BinaryFunctionNode(BinaryFunctionNode::Operation::division,
-               $1, new NumberNode(std::stoi(*$3)));
+               $1, $3);
         }
-        | TINTEGER { $$ = new NumberNode(std::stoi(*$1));}
         ;
 
 %%

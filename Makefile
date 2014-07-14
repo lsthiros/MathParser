@@ -1,4 +1,4 @@
-#Copyright (c) 2014 Louie Thiros
+# Copyright (c) 2014 Louie Thiros
 
 #Permission is hereby granted, free of charge, to any person obtaining a copy
 #of this software and associated documentation files (the "Software"), to deal
@@ -18,22 +18,29 @@
 #OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #THE SOFTWARE.
 
-#mothafuggin colahs
+# Mothafuggin colahs
 COLOR_NONE=\x1b[0m
 COLOR_GREEN=\x1b[32;01m
 COLOR_YELLOW=\x1b[33;01m
 COLOR_RED=\x1b[31;01m
 
-#compiler variables
+# Compiler variables
 CC = g++
 CC_FLAGS = -g -std=c++11
 
-#project variables
+# Project variables
 EXECUTABLE_NAME = LexTest
-SOURCES = NumberNode.cpp BinaryFunctionNode.cpp ProgramNode.cpp parser.cpp tokens.cpp main.cpp
-EXT_LIB = 
+SOURCES = NumberNode.cpp BinaryFunctionNode.cpp ProgramNode.cpp parser.cpp tokens.cpp NodeBox.cpp ProgramGenerator.cpp main.cpp
+LEXER_DEF = tokens.l
+PARSER_DEF = parser.y
+EXT_LIB = sfml-graphics sfml-window sfml-system
+
+# Generated variables (Don't change these)
 LIBFLAGS = $(addprefix -l, $(EXT_LIB))
 OBJECTS = $(SOURCES:.cpp=.o)
+GENERATED_LEXER = $(LEXER_DEF:.l=.cpp)
+GENERATED_PARSER = $(PARSER_DEF:.y=.cpp)
+GENERATED_PARSER_HEADER = $(PARSER_DEF:.y=.hpp)
 
 all : $(EXECUTABLE_NAME)
 
@@ -41,19 +48,18 @@ $(EXECUTABLE_NAME) : $(OBJECTS)
 	@echo -en "$(COLOR_RED)Linking Objects\n$(COLOR_NONE)"
 	$(CC) $(CC_FLAGS) $(OBJECTS) $(LIBFLAGS) -o $(EXECUTABLE_NAME)
 
-parser.cpp : parser.y
+$(GENERATED_PARSER) : $(PARSER_DEF)
 	@echo -en "$(COLOR_YELLOW)Generating Parser\n$(COLOR_NONE)"
-	bison -d -o parser.cpp parser.y
+	bison -d -o $(GENERATED_PARSER) $(PARSER_DEF)
 
-tokens.cpp : tokens.l parser.cpp
+$(GENERATED_LEXER) : $(LEXER_DEF) $(GENERATED_PARSER)
 	@echo -en "$(COLOR_YELLOW)Generating Lexer\n$(COLOR_NONE)"
-	lex -o tokens.cpp tokens.l
+	lex --header-file=$(LEXER_DEF:.l=.h) -o $(GENERATED_LEXER) $(LEXER_DEF) 
 
 %.o : %.cpp
 	@echo -en "$(COLOR_GREEN)Compiling $<\n$(COLOR_NONE)"
 	$(CC) $(CC_FLAGS) -c $< -o $@
 
 clean:
-	rm -rf *.o $(EXECUTABLE_NAME)
-	rm -rf tokens.cpp parser.cpp parser.hpp
+	rm -rf $(OBJECTS) $(EXECUTABLE_NAME) $(GENERATED_PARSER) $(GENERATED_PARSER_HEADER) $(GENERATED_LEXER)
 

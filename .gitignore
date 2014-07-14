@@ -1,3 +1,7 @@
+*.swp
 *.o
 LexTest
 test
+parser.cpp
+parser.hpp
+tokens.cpp

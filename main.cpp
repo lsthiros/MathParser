@@ -1,11 +1,13 @@
+#include <string>
 #include <iostream>
 #include "Node.hpp"
+#include "tokens.h"
 
-extern Node* root;
-extern int yyparse();
+#include "ProgramGenerator.hpp"
 
 int main(int argc, char** argv) {
-   yyparse();
 
-   std::cout << root->execute() << std::endl;
+   ProgramNode* programRoot = ProgramGenerator::generateProgram(
+         "(1 + 2 + 3)");
+   std::cout << programRoot->execute() << std::endl;
 }
